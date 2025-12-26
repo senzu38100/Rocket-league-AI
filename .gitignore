@@ -1,80 +1,27 @@
-# Python
+# --- Python générique ---
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-.Python
-env/
+*$py.class
 venv/
-ENV/
-*.env
-*.venv
-*.egg
-*.egg-info/
-dist/
-build/
-*.manifest
-*.spec
+.env
 
-# CMake
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles/
-CMakeScripts/
-Testing/
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps/
+# --- Machine Learning & Data ---
+# Ignore tous les dossiers de données
+data/
+datasets/
+replays/
+training_data/
 
-# Ninja
-.ninja*
-build.ninja
+# Ignore les logs Weights & Biases
+wandb/
 
-# Build-related
-RocketSim.Dir/
-build/
-x86/
-x64/
-Release/
-Debug/
-out/
-*.obj
-*.lib
-*.exe
-*.pdb
-*.ilk
-*.tmp
-*.pyd
-*.whl
+# Ignore les modèles lourds (sauf si tu veux en partager un petit)
+*.pt
+*.pth
+*.onnx
+models/
+checkpoints/
 
-# Arena collision mesh files
-*.cmf
-
-# Raw binary files
-*.bin
-
-# Visual Studio
-.vs/
-*.vcxproj
-*.sln
-*.filters
-*.user
-CMakeSettings.json
-
-# JetBrains IDEs
+# --- IDE (VS Code, Pycharm) ---
+.vscode/
 .idea/
-
-# Miscellaneous
-*.log
-*.DS_Store
-Thumbs.db
-*.bak
-*.swp
-*.swo
-*.orig
-
-# Anything starting with three underscores
-___*

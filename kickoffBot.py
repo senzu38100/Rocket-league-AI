@@ -14,6 +14,18 @@ from rlgym.rocket_league.api import GameState, Car
 DEFAULT_UDP_IP = "127.0.0.1"
 DEFAULT_UDP_PORT = 9273  
 
+VISUALIZE_MODE = False
+
+
+if VISUALIZE_MODE:
+    RENDER_MODE=True
+    RENDER_DELAY=0.008
+else:
+    RENDER_MODE=False 
+    RENDER_DELAY=0.0
+
+
+
 BUTTON_NAMES = ("throttle", "steer", "pitch", "yaw", "roll", "jump", "boost", "handbrake")
 
 class StepReward(RewardFunction[AgentID, GameState, float]):
@@ -29,13 +41,13 @@ class TouchOnce:
     """
     Stops the episode when any of the agent touches the ball
     """
-    def reset(self, initial_state: GameState, shared_info: Dict[str, Any]) -> None:
+    def reset(self, agents,  initial_state: GameState, shared_info: Dict[str, Any]) -> None:
         pass
-    def isDone(self, state: GameState, shared_info: Dict[str, Any]) -> Dict[AgentID, bool]:
+    def is_done(self, agents, state: GameState, shared_info: Dict[str, Any]) -> Dict[AgentID, bool]:
         """
         If anyone touches the ball, we stop everyone
         """
-        touched = any(car.ball_touches > 0 for car in state.car.values())
+        touched = any(car.ball_touches > 0 for car in state.cars.values())
         return {agent_id: touched for agent_id in state.cars}
 
 class RocketSimVisRenderer(Renderer[GameState]):
@@ -217,10 +229,10 @@ def build_rlgym_v2_env():
     truncation_condition = TimeoutCondition(timeout_seconds=5.0)
 
     reward_fn = CombinedReward(
-            (SpeedTowardBallReward(), 1.0),
-            (TouchReward(), 100.0),
-            (StepReward(), 1.0),
-            (VelocityBallToGoalReward(), 10)
+            (SpeedTowardBallReward(), 0.2),
+            (TouchReward(), 500.0),
+            (StepReward(), 5.0),
+            (VelocityBallToGoalReward(), 2.0)
     )
 
     obs_builder = DefaultObs(zero_padding=3,
@@ -245,7 +257,7 @@ def build_rlgym_v2_env():
         termination_cond=termination_condition,
         truncation_cond=truncation_condition,
         transition_engine=RocketSimEngine(),
-        renderer=RocketSimVisRenderer()
+        renderer=RocketSimVisRenderer() if VISUALIZE_MODE else None
     )
 
     return RLGymV2GymWrapper(rlgym_env)
@@ -275,9 +287,9 @@ if __name__ == "__main__":
                       ts_per_iteration=100_000,  # timesteps per training iteration - set this equal to the batch size
                       exp_buffer_size=300_000,  # size of experience buffer - keep this 2 - 3x the batch size
                       ppo_minibatch_size=50_000,  # minibatch size - set this as high as your GPU can handle
-                      ppo_ent_coef=0.05,
-                      render=True,
-                      render_delay=0.047,
+                      ppo_ent_coef=0.005,
+                      render=RENDER_MODE,
+                      render_delay=RENDER_DELAY,
                       add_unix_timestamp=False,
                       checkpoint_load_folder=checkpoint_load_folder,
                       checkpoints_save_folder=checkpoint_folder,                      # entropy coefficient - this determines the impact of exploration
@@ -289,7 +301,10 @@ if __name__ == "__main__":
                       standardize_obs=False, # Don't touch these.
                       save_every_ts=1_000_000,  # save every 1M steps
                       timestep_limit=1_000_000_000,  # Train for 1B steps
-                      log_to_wandb=False # Set this to True if you want to use Weights & Biases for logging.
+                      log_to_wandb=True, # Set this to True if you want to use Weights & Biases for logging.
+                      wandb_project_name="RocketLeagueKickoff",
+                      wandb_group_name="training",
+                      wandb_run_name="Essai2"
                       ) 
     learner.learn()
 

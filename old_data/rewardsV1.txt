@@ -1,0 +1,6 @@
+    reward_fn = CombinedReward(
+            (SpeedTowardBallReward(), 0.05),
+            (TouchReward(), 500.0),
+            (StepReward(), 30.0),
+            (VelocityBallToGoalReward(), 5.0)
+    )
