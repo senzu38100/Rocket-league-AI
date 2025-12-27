@@ -7,9 +7,6 @@ venv/
 
 # --- Machine Learning & Data ---
 # Ignore tous les dossiers de données
-datasets/
-replays/
-training_data/
 old_data/
 
 # Ignore les logs Weights & Biases
@@ -20,7 +17,6 @@ wandb/
 *.pth
 *.onnx
 models/
-checkpoints/
 
 # --- IDE (VS Code, Pycharm) ---
 .vscode/

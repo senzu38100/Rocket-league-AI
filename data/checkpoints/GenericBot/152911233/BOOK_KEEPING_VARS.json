@@ -1,0 +1,52 @@
+{
+    "cumulative_timesteps": 152911233,
+    "cumulative_model_updates": 9082,
+    "policy_average_reward": 120.78689690846898,
+    "epoch": 1512,
+    "ts_since_last_save": 1000028,
+    "reward_running_stats": {
+        "mean": [
+            26.246828803049777
+        ],
+        "var": [
+            2180929029.4565954
+        ],
+        "shape": [
+            1
+        ],
+        "count": 229350
+    },
+    "wandb_run_id": "4hqmt880",
+    "wandb_project": "RocketLeagueKickoff",
+    "wandb_entity": "hodkhourch-ensisa",
+    "wandb_group": "training",
+    "wandb_config": {
+        "n_proc": 32,
+        "min_inference_size": 29,
+        "timestep_limit": 1000000000,
+        "exp_buffer_size": 300000,
+        "ts_per_iteration": 100000,
+        "standardize_returns": true,
+        "standardize_obs": false,
+        "policy_layer_sizes": [
+            512,
+            512,
+            512
+        ],
+        "critic_layer_sizes": [
+            512,
+            512,
+            512
+        ],
+        "ppo_epochs": 2,
+        "ppo_batch_size": 100000,
+        "ppo_minibatch_size": 50000,
+        "ppo_ent_coef": 0.1,
+        "ppo_clip_range": 0.2,
+        "gae_lambda": 0.95,
+        "gae_gamma": 0.99,
+        "policy_lr": 0.0001,
+        "critic_lr": 0.0001,
+        "shm_buffer_size": 8192
+    }
+}
