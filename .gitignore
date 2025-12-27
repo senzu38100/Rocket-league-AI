@@ -7,7 +7,6 @@ venv/
 
 # --- Machine Learning & Data ---
 # Ignore tous les dossiers de données
-data/
 datasets/
 replays/
 training_data/

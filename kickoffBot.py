@@ -14,7 +14,7 @@ from rlgym.rocket_league.api import GameState, Car
 DEFAULT_UDP_IP = "127.0.0.1"
 DEFAULT_UDP_PORT = 9273  
 
-VISUALIZE_MODE = False
+VISUALIZE_MODE = True
 
 
 if VISUALIZE_MODE:
@@ -266,7 +266,7 @@ def build_rlgym_v2_env():
 if __name__ == "__main__":
     from rlgym_ppo import Learner
 
-    n_proc = 32
+    n_proc = 8
 
     min_inference_size = max(1, int(round(n_proc * 0.9)))
     checkpoint_folder = f"data/checkpoints/{project_name}"
