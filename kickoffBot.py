@@ -294,7 +294,7 @@ if __name__ == "__main__":
                       checkpoint_load_folder=checkpoint_load_folder,
                       checkpoints_save_folder=checkpoint_folder,                      # entropy coefficient - this determines the impact of exploration
                       policy_lr=1e-4,
-                      device="cpu", # policy learning rate
+                      device="auto", # policy learning rate
                       critic_lr=1e-4,  # critic learning rate
                       ppo_epochs=2,   # number of PPO epochs
                       standardize_returns=True, # Don't touch these.

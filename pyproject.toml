@@ -1,0 +1,26 @@
+[project]
+name = "rocket-league-ai"
+version = "0.1.0"
+description = "An agent in Rocket League trained using rlgym"
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "rlgym[all]==2.0.1",
+    "rlgym-tools==2.6.0",
+    "rlgym-ppo",
+    "torch==2.9.1",
+    "numpy==1.26.4",
+    "wandb==0.23.1",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+rlgym-ppo = { git = "https://github.com/AechPro/rlgym-ppo", rev = "4ffd2e924198bf4b2d59f4bf280b29919d7c07ea" }
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
