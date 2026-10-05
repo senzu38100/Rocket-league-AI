@@ -3,8 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 venv/
+.venv/
 .env
 
+CLAUDE.md
 # --- Machine Learning & Data ---
 # Ignore tous les dossiers de données
 old_data/
@@ -21,3 +23,10 @@ models/
 # --- IDE (VS Code, Pycharm) ---
 .vscode/
 .idea/
+
+# --- Dev tool caches ---
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
