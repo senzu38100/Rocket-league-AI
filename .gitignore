@@ -6,6 +6,7 @@ venv/
 .venv/
 .env
 
+CLAUDE.md
 # --- Machine Learning & Data ---
 # Ignore tous les dossiers de données
 old_data/
