@@ -70,6 +70,10 @@ class TestVelocityBallToGoalReward:
         for reward in rewards.values():
             assert reward >= 0.0
 
+    def test_reset_is_a_noop(self, module, kickoff_game_state):
+        reward_fn = module.VelocityBallToGoalReward()
+        assert reward_fn.reset([], kickoff_game_state, {}) is None
+
 
 @pytest.mark.parametrize("module", MODULES, ids=lambda m: m.__name__)
 class TestTouchReward:
@@ -122,6 +126,96 @@ class TestTouchOnce:
             result = done_cond.is_done([blue, orange], kickoff_game_state, {})
             assert result == {blue: True, orange: True}
         finally:
+            kickoff_game_state.cars[blue].ball_touches = 0
+
+
+class TestFaceBallReward:
+    """FaceBallReward only exists in genericBot.py."""
+
+    def test_returns_all_agents(self, kickoff_game_state, blue_and_orange_agents):
+        reward_fn = genericBot.FaceBallReward()
+        agents = list(blue_and_orange_agents)
+        rewards = reward_fn.get_rewards(agents, kickoff_game_state, {}, {}, {})
+        assert set(rewards.keys()) == set(agents)
+
+    def test_kickoff_cars_face_the_ball(self, kickoff_game_state, blue_and_orange_agents):
+        # Kickoff spawns both cars pointed at the ball, so both should score near +1.
+        reward_fn = genericBot.FaceBallReward()
+        agents = list(blue_and_orange_agents)
+        rewards = reward_fn.get_rewards(agents, kickoff_game_state, {}, {}, {})
+        for reward in rewards.values():
+            assert reward > 0.9
+
+    def test_reset_is_a_noop(self, kickoff_game_state):
+        reward_fn = genericBot.FaceBallReward()
+        reward_fn.reset([], kickoff_game_state, {})  # must not raise
+
+
+class TestZeroSumVelocityBallToGoalReward:
+    """ZeroSumVelocityBallToGoalReward only exists in genericBot.py."""
+
+    def test_stationary_ball_is_zero_for_both(self, kickoff_game_state, blue_and_orange_agents):
+        reward_fn = genericBot.ZeroSumVelocityBallToGoalReward()
+        agents = list(blue_and_orange_agents)
+        rewards = reward_fn.get_rewards(agents, kickoff_game_state, {}, {}, {})
+        for reward in rewards.values():
+            assert reward == pytest.approx(0.0)
+
+    def test_ball_moving_toward_orange_net_is_a_real_penalty_for_orange(
+        self, kickoff_game_state, blue_and_orange_agents
+    ):
+        # Unlike VelocityBallToGoalReward, the defending side must come out
+        # genuinely negative here, not just 0 -- the exact opposite of the attacker.
+        blue, orange = blue_and_orange_agents
+        reward_fn = genericBot.ZeroSumVelocityBallToGoalReward()
+        original_vel = kickoff_game_state.ball.linear_velocity.copy()
+        kickoff_game_state.ball.linear_velocity = np.array([0.0, common_values.BALL_MAX_SPEED, 0.0])
+        try:
+            rewards = reward_fn.get_rewards([blue, orange], kickoff_game_state, {}, {}, {})
+            assert rewards[blue] > 0.0
+            assert rewards[orange] == pytest.approx(-rewards[blue])
+        finally:
+            kickoff_game_state.ball.linear_velocity = original_vel
+
+
+class TestTouchStrengthReward:
+    """TouchStrengthReward only exists in genericBot.py."""
+
+    def test_no_touch_gives_zero_even_if_ball_velocity_changed(
+        self, kickoff_game_state, blue_and_orange_agents
+    ):
+        blue, orange = blue_and_orange_agents
+        reward_fn = genericBot.TouchStrengthReward()
+        reward_fn.reset([blue, orange], kickoff_game_state, {})
+        original_vel = kickoff_game_state.ball.linear_velocity.copy()
+        kickoff_game_state.ball.linear_velocity = np.array([5000.0, 0.0, 0.0])
+        try:
+            rewards = reward_fn.get_rewards([blue, orange], kickoff_game_state, {}, {}, {})
+            assert rewards[blue] == 0.0
+            assert rewards[orange] == 0.0
+        finally:
+            kickoff_game_state.ball.linear_velocity = original_vel
+
+    def test_harder_touch_scores_higher_than_a_weak_one(self, kickoff_game_state, blue_and_orange_agents):
+        blue, orange = blue_and_orange_agents
+        original_vel = kickoff_game_state.ball.linear_velocity.copy()
+        kickoff_game_state.cars[blue].ball_touches = 1
+        try:
+            weak_reward_fn = genericBot.TouchStrengthReward()
+            weak_reward_fn.reset([blue, orange], kickoff_game_state, {})
+            kickoff_game_state.ball.linear_velocity = np.array([300.0, 0.0, 0.0])
+            weak = weak_reward_fn.get_rewards([blue, orange], kickoff_game_state, {}, {}, {})
+
+            kickoff_game_state.ball.linear_velocity = original_vel
+            strong_reward_fn = genericBot.TouchStrengthReward()
+            strong_reward_fn.reset([blue, orange], kickoff_game_state, {})
+            kickoff_game_state.ball.linear_velocity = np.array([5000.0, 0.0, 0.0])
+            strong = strong_reward_fn.get_rewards([blue, orange], kickoff_game_state, {}, {}, {})
+
+            assert strong[blue] > weak[blue] > 0.0
+            assert strong[blue] <= 1.0
+        finally:
+            kickoff_game_state.ball.linear_velocity = original_vel
             kickoff_game_state.cars[blue].ball_touches = 0
 
 

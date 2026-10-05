@@ -46,3 +46,20 @@ def test_kickoff_bot_spawns_only_blue():
         assert obs.shape[0] == 1
     finally:
         env.close()
+
+
+def test_stage_2_env_resets_and_steps(monkeypatch):
+    monkeypatch.setattr(genericBot, "TRAINING_STAGE", 2)
+    env = genericBot.build_rlgym_v2_env()
+    try:
+        obs = env.reset()
+        actions = np.array([[env.action_space.sample()] for _ in range(obs.shape[0])])
+        env.step(actions)
+    finally:
+        env.close()
+
+
+def test_unimplemented_stage_raises(monkeypatch):
+    monkeypatch.setattr(genericBot, "TRAINING_STAGE", 3)
+    with pytest.raises(NotImplementedError):
+        genericBot.build_rlgym_v2_env()
